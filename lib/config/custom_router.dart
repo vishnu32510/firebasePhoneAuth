@@ -5,6 +5,8 @@ class CustomRouter {
   static Route onGenerateRoute(RouteSettings settings){
 print("Route : ${settings.name}");
 switch(settings.name){
+  case SplashScreen.routeName:
+    return SplashScreen.route();
   case LoginScreen.routeName:
     return LoginScreen.route();
   case PluginScreen.routeName:

@@ -30,200 +30,205 @@ class _LoginScreenState extends State<LoginScreen> {
 
   TextEditingController otpController = TextEditingController();
   bool isLoading = false;
+  String verificationId = "";
+
   @override
   void initState() {
     super.initState();
-    currentUser();
+    // currentUser();
     print("////////////////////////");
   }
 
-  Future currentUser() async {
-    if (FirebaseAuth.instance.currentUser != null && !isLoading) {
-      isLoading = true;
-      await addLoginDetails(context: context);
-      return true;
-    } else {
-      print("No current user");
-      return false;
-    }
-  }
+  // Future currentUser() async {
+  //   if (FirebaseAuth.instance.currentUser != null && !isLoading) {
+  //     isLoading = true;
+  //     await addLoginDetails(context: context);
+  //     return true;
+  //   } else {
+  //     print("No current user");
+  //     return false;
+  //   }
+  // }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: FutureBuilder(
-          future: currentUser(),
-          builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
-            if (!snapshot.hasData) {
-              return Center(
-                child: CircularProgressIndicator(),
-              );
-            }
-            return Stack(
-              alignment: Alignment.center,
-              children: [
-                Container(
-                  color: primaryColor,
+      body: Stack(
+        alignment: Alignment.center,
+        children: [
+          Container(
+            color: primaryColor,
+          ),
+          Positioned(
+              top: -40,
+              right: -10,
+              child: Container(
+                height: 130,
+                width: 130,
+                decoration: BoxDecoration(
+                  color: secondaryColor,
+                  shape: BoxShape.circle,
+                  // borderRadius: BorderRadius.circular(10),
                 ),
-                Positioned(
-                    top: -40,
-                    right: -10,
-                    child: Container(
-                      height: 130,
-                      width: 130,
-                      decoration: BoxDecoration(
-                        color: secondaryColor,
-                        shape: BoxShape.circle,
-                        // borderRadius: BorderRadius.circular(10),
-                      ),
-                    )),
-                Positioned.fill(
-                  top: 90,
-                  left: 0,
-                  child: Container(
-                    decoration: BoxDecoration(
-                        color: Colors.black,
-                        borderRadius: BorderRadius.only(
-                          topLeft: Radius.circular(20),
-                          topRight: Radius.circular(20),
-                        )),
-                  ),
-                ),
-                Positioned(
-                  top: 80,
-                  child: Container(
-                    padding:
-                        const EdgeInsets.symmetric(vertical: 5, horizontal: 20),
-                    decoration: BoxDecoration(
-                      color: Colors.blue,
-                      borderRadius: BorderRadius.circular(7),
-                    ),
-                    child: Text(
-                      "LOGIN",
-                      style: TextStyle(color: Colors.white, fontSize: 20),
-                    ),
-                  ),
-                ),
-                Positioned.fill(
-                    top: 100,
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(vertical: 20),
-                      alignment: Alignment.center,
-                      child: SingleChildScrollView(
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Padding(
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: 30, vertical: 10),
-                              child: Text(
-                                "Phone Number",
-                                style: TextStyle(
-                                    color: Colors.white, fontSize: 18),
-                              ),
-                            ),
-                            Padding(
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: 30, vertical: 10),
-                              child: TextField(
-                                autofocus: false,
-                                controller: phoneNumberController,
-                                keyboardType: TextInputType.phone,
-                                style: TextStyle(
-                                    fontSize: 15.0, color: Colors.white),
-                                decoration: InputDecoration(
-                                  border: InputBorder.none,
-                                  hintText: '',
-                                  filled: true,
-                                  fillColor: primaryColor,
-                                  contentPadding: const EdgeInsets.only(
-                                      left: 14.0, bottom: 6.0, top: 8.0),
-                                  focusedBorder: OutlineInputBorder(
-                                    borderSide:
-                                        BorderSide(color: secondaryColor),
-                                    borderRadius: BorderRadius.circular(10.0),
-                                  ),
-                                  enabledBorder: OutlineInputBorder(
-                                    borderSide: BorderSide(color: primaryColor),
-                                    borderRadius: BorderRadius.circular(10.0),
-                                  ),
-                                ),
-                              ),
-                            ),
-                            SizedBox(height: 10),
-                            Padding(
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: 30, vertical: 10),
-                              child: Text(
-                                "OTP",
-                                style: TextStyle(
-                                    color: Colors.white, fontSize: 18),
-                              ),
-                            ),
-                            Padding(
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: 30, vertical: 10),
-                              child: TextField(
-                                controller: otpController,
-                                autofocus: false,
-                                keyboardType: TextInputType.number,
-                                style: TextStyle(
-                                    fontSize: 15.0, color: Colors.white),
-                                decoration: InputDecoration(
-                                  border: InputBorder.none,
-                                  hintText: '',
-                                  filled: true,
-                                  fillColor: primaryColor,
-                                  contentPadding: const EdgeInsets.only(
-                                      left: 14.0, bottom: 6.0, top: 8.0),
-                                  focusedBorder: OutlineInputBorder(
-                                    borderSide:
-                                        BorderSide(color: secondaryColor),
-                                    borderRadius: BorderRadius.circular(10.0),
-                                  ),
-                                  enabledBorder: UnderlineInputBorder(
-                                    borderSide: BorderSide(color: primaryColor),
-                                    borderRadius: BorderRadius.circular(10.0),
-                                  ),
-                                ),
-                              ),
-                            ),
-                            InkWell(
-                              onTap: () {
-                                // Navigator.of(context).pushNamedAndRemoveUntil(
-                                //   PluginScreen.routeName,
-                                //   (Route<dynamic> route) => false,
-                                // );
-                                loginWithPhoneNumber(
-                                    context: context,
-                                    value: phoneNumberController.text.trim());
-                              },
-                              child: Container(
-                                margin: const EdgeInsets.symmetric(
-                                    horizontal: 30, vertical: 40),
-                                padding:
-                                    const EdgeInsets.symmetric(vertical: 10),
-                                alignment: Alignment.center,
-                                decoration: BoxDecoration(
-                                  color: Colors.grey[800],
-                                  borderRadius: BorderRadius.circular(10),
-                                ),
-                                child: Text(
-                                  "LOGIN",
-                                  style: TextStyle(
-                                      color: Colors.white, fontSize: 18),
-                                ),
-                              ),
-                            ),
-                          ],
+              )),
+          Positioned.fill(
+            top: 90,
+            left: 0,
+            child: Container(
+              decoration: BoxDecoration(
+                  color: Colors.black,
+                  borderRadius: BorderRadius.only(
+                    topLeft: Radius.circular(20),
+                    topRight: Radius.circular(20),
+                  )),
+            ),
+          ),
+          Positioned(
+            top: 80,
+            child: Container(
+              padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 20),
+              decoration: BoxDecoration(
+                color: Colors.blue,
+                borderRadius: BorderRadius.circular(7),
+              ),
+              child: Text(
+                "LOGIN",
+                style: TextStyle(color: Colors.white, fontSize: 20),
+              ),
+            ),
+          ),
+          Positioned.fill(
+              top: 100,
+              child: Container(
+                padding: const EdgeInsets.symmetric(vertical: 20),
+                alignment: Alignment.center,
+                child: SingleChildScrollView(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 30, vertical: 10),
+                        child: Text(
+                          "Phone Number",
+                          style: TextStyle(color: Colors.white, fontSize: 18),
                         ),
                       ),
-                    ))
-              ],
-            );
-          }),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 30, vertical: 10),
+                        child: TextField(
+                          autofocus: false,
+                          controller: phoneNumberController,
+                          keyboardType: TextInputType.phone,
+                          style: TextStyle(fontSize: 15.0, color: Colors.white),
+                          decoration: InputDecoration(
+                            border: InputBorder.none,
+                            hintText: '',
+                            filled: true,
+                            fillColor: primaryColor,
+                            contentPadding: const EdgeInsets.only(
+                                left: 14.0, bottom: 6.0, top: 8.0),
+                            focusedBorder: OutlineInputBorder(
+                              borderSide: BorderSide(color: secondaryColor),
+                              borderRadius: BorderRadius.circular(10.0),
+                            ),
+                            enabledBorder: OutlineInputBorder(
+                              borderSide: BorderSide(color: primaryColor),
+                              borderRadius: BorderRadius.circular(10.0),
+                            ),
+                          ),
+                        ),
+                      ),
+                      SizedBox(height: 10),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 30, vertical: 10),
+                        child: Text(
+                          "OTP",
+                          style: TextStyle(color: Colors.white, fontSize: 18),
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 30, vertical: 10),
+                        child: TextField(
+                          controller: otpController,
+                          autofocus: false,
+                          keyboardType: TextInputType.number,
+                          onChanged: (value) async {
+                            // print("verification CS code: " + verificationId);
+                            if (phoneNumberController.text.trim().isNotEmpty &&
+                                otpController.text.trim().length == 6) {
+                              print("verification CS code: " + verificationId);
+                              PhoneAuthCredential credential =
+                                  PhoneAuthProvider.credential(
+                                      verificationId: verificationId,
+                                      smsCode: otpController.text.trim());
+
+                              await FirebaseAuth.instance
+                                  .signInWithCredential(credential)
+                                  .then((value) async {
+                                var res =
+                                    await addLoginDetails(context: context);
+                                print(value.user!.phoneNumber);
+                              }).onError((error, stackTrace) {
+                                print(error);
+                              });
+                            }
+                          },
+                          style: TextStyle(fontSize: 15.0, color: Colors.white),
+                          decoration: InputDecoration(
+                            border: InputBorder.none,
+                            hintText: '',
+                            filled: true,
+                            fillColor: primaryColor,
+                            contentPadding: const EdgeInsets.only(
+                                left: 14.0, bottom: 6.0, top: 8.0),
+                            focusedBorder: OutlineInputBorder(
+                              borderSide: BorderSide(color: secondaryColor),
+                              borderRadius: BorderRadius.circular(10.0),
+                            ),
+                            enabledBorder: UnderlineInputBorder(
+                              borderSide: BorderSide(color: primaryColor),
+                              borderRadius: BorderRadius.circular(10.0),
+                            ),
+                          ),
+                        ),
+                      ),
+                      InkWell(
+                        onTap: () {
+                          // Navigator.of(context).pushNamedAndRemoveUntil(
+                          //   PluginScreen.routeName,
+                          //   (Route<dynamic> route) => false,
+                          // );
+                          loginWithPhoneNumber(
+                              context: context,
+                              value: phoneNumberController.text.trim());
+                        },
+                        child: Container(
+                          margin: const EdgeInsets.symmetric(
+                              horizontal: 30, vertical: 40),
+                          padding: const EdgeInsets.symmetric(vertical: 10),
+                          alignment: Alignment.center,
+                          decoration: BoxDecoration(
+                            color: Colors.grey[800],
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          child: Text(
+                            "LOGIN",
+                            style: TextStyle(color: Colors.white, fontSize: 18),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ))
+        ],
+      ),
     );
   }
 
@@ -254,13 +259,18 @@ class _LoginScreenState extends State<LoginScreen> {
         if (e.code == 'invalid-phone-number') {
           print('The provided phone number is not valid.');
         }
+        Navigator.of(context)
+            .popUntil(ModalRoute.withName(LoginScreen.routeName));
       },
-      codeSent: (String verificationId, int? resendToken) {
+      codeSent: (String verificationIdd, int? resendToken) {
+        verificationId = verificationIdd;
         onLoading(context: context, value: "OTP Sent");
         print("verification CS code: " + verificationId);
       },
       codeAutoRetrievalTimeout: (String verificationId) {
         onLoading(context: context, value: "OTP Auto Retrieval Failed");
+        Navigator.of(context)
+            .popUntil(ModalRoute.withName(LoginScreen.routeName));
         print("verification AR code: " + verificationId);
       },
     );
