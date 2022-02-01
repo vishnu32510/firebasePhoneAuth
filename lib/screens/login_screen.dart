@@ -294,7 +294,7 @@ class _LoginScreenState extends State<LoginScreen> {
       PhoneAuthProvider.credential(
           verificationId: verificationId,
           smsCode: otpController.text.trim());
-
+      onLoading(context: context, value: "Sighing In");
       await FirebaseAuth.instance
           .signInWithCredential(credential)
           .then((value) async {
@@ -302,6 +302,8 @@ class _LoginScreenState extends State<LoginScreen> {
         await addLoginDetails(context: context);
         print(value.user!.phoneNumber);
       }).onError((error, stackTrace) {
+        Navigator.of(context)
+            .popUntil(ModalRoute.withName(PluginScreen.routeName));
         print(error);
         showToastMsg(error.toString().split("] ").last);
         verificationId = "";
