@@ -3,6 +3,7 @@ import 'dart:io';
 import 'dart:typed_data';
 import 'dart:ui' as ui;
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/rendering.dart';
 import 'package:intl/intl.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -109,11 +110,15 @@ class _PluginScreenState extends State<PluginScreen> {
               right: 30,
               child: InkWell(
                 onTap: () {
+                  onLoading(context: context, value: "Signing Out");
                   FirebaseAuth.instance.signOut().then((value) {
                     print("Sigh out");
                     Navigator.pushReplacementNamed(
                         context, LoginScreen.routeName);
                   }).onError((error, stackTrace) {
+                    Navigator.of(context)
+                        .popUntil(ModalRoute.withName(PluginScreen.routeName));
+                    showToastMsg(error);
                     print(error);
                   });
                 },
@@ -150,10 +155,10 @@ class _PluginScreenState extends State<PluginScreen> {
           ),
           Positioned.fill(
             top: 100,
-            child: Container(
-              padding: const EdgeInsets.symmetric(vertical: 20),
-              alignment: Alignment.center,
-              child: SingleChildScrollView(
+            child: SingleChildScrollView(
+              child: Container(
+                padding: const EdgeInsets.symmetric(vertical: 20),
+                alignment: Alignment.center,
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment: CrossAxisAlignment.center,
@@ -205,6 +210,7 @@ class _PluginScreenState extends State<PluginScreen> {
                         style: TextStyle(color: Colors.white, fontSize: 18),
                       ),
                     ),
+                    // Expanded(child: Container(),),
                     InkWell(
                       onTap: () {
                         Navigator.of(context).pushNamed(
@@ -215,7 +221,8 @@ class _PluginScreenState extends State<PluginScreen> {
                           stream: FirebaseFirestore.instance
                               .collection("users")
                               .doc(userId)
-                              .collection("login_details").orderBy("date_time",descending: true)
+                              .collection("login_details")
+                              .orderBy("date_time", descending: true)
                               .snapshots(),
                           builder: (context, snapshot) {
                             if (!snapshot.hasData) {
@@ -279,6 +286,7 @@ class _PluginScreenState extends State<PluginScreen> {
   }
 
   Future<void> takePicture({required BuildContext context}) async {
+    onLoading(context: context, value: "Updating QR");
     final RenderRepaintBoundary boundary =
         globalKey.currentContext!.findRenderObject()! as RenderRepaintBoundary;
     final ui.Image image = await boundary.toImage();
@@ -304,8 +312,15 @@ class _PluginScreenState extends State<PluginScreen> {
           .doc(loginId)
           .set({
         "qrImage": value,
-      },SetOptions(merge: true)).then((value) {
+      }, SetOptions(merge: true)).then((value) {
+        Navigator.of(context)
+            .popUntil(ModalRoute.withName(PluginScreen.routeName));
+        showToastMsg("QR Update Successful");
         print("dome");
+      }).onError((error, stackTrace) {
+        Navigator.of(context)
+            .popUntil(ModalRoute.withName(PluginScreen.routeName));
+        showToastMsg("QR Update Failed");
       });
     });
 

@@ -143,57 +143,46 @@ class _LoginScreenState extends State<LoginScreen> {
                         ),
                       ),
                       SizedBox(height: 10),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 30, vertical: 10),
-                        child: Text(
-                          "OTP",
-                          style: TextStyle(color: Colors.white, fontSize: 18),
+                      Visibility(
+                        visible: verificationId!="",
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 30, vertical: 10),
+                          child: Text(
+                            "OTP",
+                            style: TextStyle(color: Colors.white, fontSize: 18),
+                          ),
                         ),
                       ),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 30, vertical: 10),
-                        child: TextField(
-                          controller: otpController,
-                          autofocus: false,
-                          keyboardType: TextInputType.number,
-                          onChanged: (value) async {
-                            // print("verification CS code: " + verificationId);
-                            if (phoneNumberController.text.trim().isNotEmpty &&
-                                otpController.text.trim().length == 6) {
-                              print("verification CS code: " + verificationId);
-                              PhoneAuthCredential credential =
-                                  PhoneAuthProvider.credential(
-                                      verificationId: verificationId,
-                                      smsCode: otpController.text.trim());
-
-                              await FirebaseAuth.instance
-                                  .signInWithCredential(credential)
-                                  .then((value) async {
-                                var res =
-                                    await addLoginDetails(context: context);
-                                print(value.user!.phoneNumber);
-                              }).onError((error, stackTrace) {
-                                print(error);
-                              });
-                            }
-                          },
-                          style: TextStyle(fontSize: 15.0, color: Colors.white),
-                          decoration: InputDecoration(
-                            border: InputBorder.none,
-                            hintText: '',
-                            filled: true,
-                            fillColor: primaryColor,
-                            contentPadding: const EdgeInsets.only(
-                                left: 14.0, bottom: 6.0, top: 8.0),
-                            focusedBorder: OutlineInputBorder(
-                              borderSide: BorderSide(color: secondaryColor),
-                              borderRadius: BorderRadius.circular(10.0),
-                            ),
-                            enabledBorder: UnderlineInputBorder(
-                              borderSide: BorderSide(color: primaryColor),
-                              borderRadius: BorderRadius.circular(10.0),
+                      Visibility(
+                        visible: verificationId!="",
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 30, vertical: 10),
+                          child: TextField(
+                            controller: otpController,
+                            autofocus: false,
+                            keyboardType: TextInputType.number,
+                            onChanged: (value) async {
+                              // print("verification CS code: " + verificationId);
+                              loginWithCode();
+                            },
+                            style: TextStyle(fontSize: 15.0, color: Colors.white),
+                            decoration: InputDecoration(
+                              border: InputBorder.none,
+                              hintText: '',
+                              filled: true,
+                              fillColor: primaryColor,
+                              contentPadding: const EdgeInsets.only(
+                                  left: 14.0, bottom: 6.0, top: 8.0),
+                              focusedBorder: OutlineInputBorder(
+                                borderSide: BorderSide(color: secondaryColor),
+                                borderRadius: BorderRadius.circular(10.0),
+                              ),
+                              enabledBorder: UnderlineInputBorder(
+                                borderSide: BorderSide(color: primaryColor),
+                                borderRadius: BorderRadius.circular(10.0),
+                              ),
                             ),
                           ),
                         ),
@@ -204,9 +193,12 @@ class _LoginScreenState extends State<LoginScreen> {
                           //   PluginScreen.routeName,
                           //   (Route<dynamic> route) => false,
                           // );
+                          if(verificationId!=""){
+                            loginWithCode();
+                          }else{
                           loginWithPhoneNumber(
                               context: context,
-                              value: phoneNumberController.text.trim());
+                              value: phoneNumberController.text.trim());}
                         },
                         child: Container(
                           margin: const EdgeInsets.symmetric(
@@ -237,6 +229,7 @@ class _LoginScreenState extends State<LoginScreen> {
     print("////////");
     print(value);
     onLoading(context: context, value: "Sending OTP");
+    showToastMsg("Sending OTP");
     await FirebaseAuth.instance.verifyPhoneNumber(
       phoneNumber: '+91$value',
       timeout: Duration(seconds: 60),
@@ -248,31 +241,75 @@ class _LoginScreenState extends State<LoginScreen> {
             .signInWithCredential(credential)
             .then((value) async {
           var res = await addLoginDetails(context: context);
-          print(value.user!.phoneNumber);
+          // print(value.user!.phoneNumber);
         }).onError((error, stackTrace) {
           print(error);
+          showToastMsg(null);
+          Navigator.of(context)
+              .popUntil(ModalRoute.withName(LoginScreen.routeName));
         });
         print("Verification complete ${credential.smsCode}");
       },
       verificationFailed: (FirebaseAuthException e) {
         print("Error:: $e");
+        showToastMsg(e.message);
+        Navigator.of(context)
+            .popUntil(ModalRoute.withName(LoginScreen.routeName));
         if (e.code == 'invalid-phone-number') {
           print('The provided phone number is not valid.');
         }
-        Navigator.of(context)
-            .popUntil(ModalRoute.withName(LoginScreen.routeName));
       },
       codeSent: (String verificationIdd, int? resendToken) {
         verificationId = verificationIdd;
-        onLoading(context: context, value: "OTP Sent");
+        // onLoading(context: context, value: "OTP Sent");
+        setState(() {
+
+        });
+        Navigator.of(context)
+            .popUntil(ModalRoute.withName(LoginScreen.routeName));
+        showToastMsg("OTP Sent");
         print("verification CS code: " + verificationId);
       },
       codeAutoRetrievalTimeout: (String verificationId) {
-        onLoading(context: context, value: "OTP Auto Retrieval Failed");
+        // onLoading(context: context, value: "OTP Auto Retrieval Failed");
+        Navigator.of(context)
+            .popUntil(ModalRoute.withName(LoginScreen.routeName));
+        showToastMsg("OTP Auto Retrieval Failed");
         Navigator.of(context)
             .popUntil(ModalRoute.withName(LoginScreen.routeName));
         print("verification AR code: " + verificationId);
       },
-    );
+    ).onError((error, stackTrace) {
+      Navigator.of(context)
+          .popUntil(ModalRoute.withName(LoginScreen.routeName));
+      showToastMsg(error);
+    });
   }
-}
+
+  Future<void> loginWithCode() async {
+    if (phoneNumberController.text.trim().isNotEmpty &&
+        otpController.text.trim().length == 6) {
+      print("verification CS code: " + verificationId);
+      PhoneAuthCredential credential =
+      PhoneAuthProvider.credential(
+          verificationId: verificationId,
+          smsCode: otpController.text.trim());
+
+      await FirebaseAuth.instance
+          .signInWithCredential(credential)
+          .then((value) async {
+        var res =
+        await addLoginDetails(context: context);
+        print(value.user!.phoneNumber);
+      }).onError((error, stackTrace) {
+        print(error);
+        showToastMsg(error.toString().split("] ").last);
+        verificationId = "";
+        otpController.text = "";
+        setState(() {
+
+        });
+      });
+    }
+  }}
+

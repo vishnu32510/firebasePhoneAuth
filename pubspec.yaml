@@ -38,6 +38,7 @@ dependencies:
   geolocator: ^8.0.5
   path_provider:
   lottie:
+  fluttertoast:
 
 
 dev_dependencies:

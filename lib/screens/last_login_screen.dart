@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_task/screens/login_screen.dart';
@@ -79,10 +80,17 @@ class _LastLoginScreenState extends State<LastLoginScreen>
                     // Expanded(child: SizedBox()),
                     InkWell(
                       onTap: () {
-                        Navigator.pushNamedAndRemoveUntil(
-                            context,
-                            LoginScreen.routeName,
-                            (Route<dynamic> route) => false);
+                        onLoading(context: context,value:"Signing Out");
+                        FirebaseAuth.instance.signOut().then((value) {
+                          print("Sigh out");
+                          Navigator.pushReplacementNamed(
+                              context, LoginScreen.routeName);
+                        }).onError((error, stackTrace) {
+                          Navigator.of(context)
+                              .popUntil(ModalRoute.withName(LastLoginScreen.routeName));
+                          showToastMsg(error);
+                          print(error);
+                        });
                       },
                       child: Text(
                         'Logout',
