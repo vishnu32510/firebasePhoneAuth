@@ -155,12 +155,23 @@ class _PluginScreenState extends State<PluginScreen> {
           ),
           Positioned.fill(
             top: 100,
+            child: Container(
+              alignment: Alignment.center,
+              child:CustomPaint(
+                size: Size(300,250),
+                painter: RPSCustomPainter(),
+              ),
+            ),
+          ),
+          Positioned.fill(
+            top: 100,
             child: SingleChildScrollView(
               child: Container(
+                height: MediaQuery.of(context).size.height - 100,
                 padding: const EdgeInsets.symmetric(vertical: 20),
-                alignment: Alignment.center,
+                // alignment: Alignment.center,
                 child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.start,
                   crossAxisAlignment: CrossAxisAlignment.center,
                   mainAxisSize: MainAxisSize.max,
                   children: [
@@ -210,7 +221,7 @@ class _PluginScreenState extends State<PluginScreen> {
                         style: TextStyle(color: Colors.white, fontSize: 18),
                       ),
                     ),
-                    // Expanded(child: Container(),),
+                    Expanded(child: Container(),),
                     InkWell(
                       onTap: () {
                         Navigator.of(context).pushNamed(
